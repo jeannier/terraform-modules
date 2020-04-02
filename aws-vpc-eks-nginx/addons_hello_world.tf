@@ -7,32 +7,38 @@
 locals {
   container_port = 8080
   elb_port       = 80
-  labels_1 = {
-    application = "hello-world-1"
-  }
-  labels_2 = {
-    application = "hello-world-2"
-  }
 }
 
 # deployment + service for hello-app:1.0
 
-resource "kubernetes_deployment" "deployment_hello_world_1" {
+resource "kubernetes_deployment" "deployment_hello_world" {
+
+  for_each = {
+    "hello-world-1" = {
+      "labels" = { application = "hello-world-1" },
+      "image"  = "gcr.io/google-samples/hello-app:1.0"
+    }
+    "hello-world-2" = {
+      "labels" = { application = "hello-world-2" },
+      "image"  = "gcr.io/google-samples/hello-app:2.0"
+    }
+  }
+
   metadata {
-    name = "hello-world-1"
+    name = each.key
   }
   spec {
     selector {
-      match_labels = local.labels_1
+      match_labels = each.value.labels
     }
     template {
       metadata {
-        labels = local.labels_1
+        labels = each.value.labels
       }
       spec {
         container {
-          image = "gcr.io/google-samples/hello-app:1.0"
-          name  = "hello-app"
+          image = each.value.image
+          name  = each.key
           port {
             container_port = local.container_port
           }
@@ -46,57 +52,18 @@ resource "kubernetes_deployment" "deployment_hello_world_1" {
   ]
 }
 
-resource "kubernetes_service" "service_hello_world_1" {
+resource "kubernetes_service" "service_hello_world" {
+
+  for_each = {
+    "hello-world-1" = { application = "hello-world-1" }
+    "hello-world-2" = { application = "hello-world-2" }
+  }
+
   metadata {
-    name = "hello-world-1"
+    name = each.key
   }
   spec {
-    selector = local.labels_1
-    port {
-      port        = local.elb_port
-      target_port = local.container_port
-    }
-    type = "LoadBalancer"
-  }
-}
-
-# deployment + service for hello-app:2.0
-
-resource "kubernetes_deployment" "deployment_hello_world_2" {
-  metadata {
-    name = "hello-world-2"
-  }
-  spec {
-    selector {
-      match_labels = local.labels_2
-    }
-    template {
-      metadata {
-        labels = local.labels_2
-      }
-      spec {
-        container {
-          image = "gcr.io/google-samples/hello-app:2.0"
-          name  = "hello-app"
-          port {
-            container_port = local.container_port
-          }
-        }
-      }
-    }
-  }
-  depends_on = [
-    # deployments can't complete without the workers nodes
-    aws_eks_node_group.eks_node_group
-  ]
-}
-
-resource "kubernetes_service" "service_hello_world_2" {
-  metadata {
-    name = "hello-world-2"
-  }
-  spec {
-    selector = local.labels_2
+    selector = each.value
     port {
       port        = local.elb_port
       target_port = local.container_port
@@ -117,21 +84,21 @@ resource "kubernetes_ingress" "ingress_hello_world" {
   spec {
     rule {
       http {
-        path {
-          path = "/1"
-          backend {
-            service_name = "hello-world-1"
-            service_port = 8080
-          }
-        }
-        path {
-          path = "/2"
-          backend {
-            service_name = "hello-world-2"
-            service_port = 8080
+
+        dynamic "path" {
+          for_each = ["1", "2"]
+          content {
+
+            path = "/${path.value}"
+
+            backend {
+              service_name = "hello-world-${path.value}"
+              service_port = local.container_port
+            }
           }
         }
       }
     }
   }
 }
+
