@@ -21,6 +21,8 @@ resource "aws_eks_node_group" "eks_node_group" {
 
 }
 
+# IAM role which allows the EKS workers to communicate with AWS
+
 resource "aws_iam_role" "iam_role_workers" {
   name               = "${var.cluster_name}-workers"
   assume_role_policy = data.aws_iam_policy_document.iam_policy_document_workers.json

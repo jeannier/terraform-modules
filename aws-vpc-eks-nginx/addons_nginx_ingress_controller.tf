@@ -1,9 +1,6 @@
 
-resource "null_resource" "nginx_ingress_controller" {
+resource "null_resource" "exec_nginx_ingress_controller" {
 
-  depends_on = [
-    local_file.kubeconfig_file
-  ]
   provisioner "local-exec" {
     command = "kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/nginx-${var.nginx_ingress_controller_version}/deploy/static/mandatory.yaml"
     environment = {
@@ -16,13 +13,18 @@ resource "null_resource" "nginx_ingress_controller" {
       KUBECONFIG = "kube.config"
     }
   }
+
+  depends_on = [
+    local_file.kubeconfig_file
+  ]
+
 }
 
 # inspired from
 # https://github.com/kubernetes/ingress-nginx/blob/master/deploy/static/provider/aws/service-l7.yaml
 # but without the SSL-related configuration
 
-resource "kubernetes_service" "ingress-nginx" {
+resource "kubernetes_service" "service_ingress_nginx" {
   metadata {
     name      = "ingress-nginx"
     namespace = "ingress-nginx"
@@ -47,4 +49,11 @@ resource "kubernetes_service" "ingress-nginx" {
     }
     type = "LoadBalancer"
   }
+
+
+  depends_on = [
+    # namespace "ingress-nginx" needs to be created beforehand
+    null_resource.exec_nginx_ingress_controller
+  ]
+
 }

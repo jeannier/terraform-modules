@@ -1,41 +1,4 @@
 
-# read-only clusterrole/clusterrolebinding is set using the 'kubernetes' provider
-
-resource "kubernetes_cluster_role" "read-only" {
-  metadata {
-    name = "read-only"
-  }
-  # to read anything
-  rule {
-    api_groups = [""]
-    resources  = ["*"]
-    verbs      = ["get", "list", "watch"]
-  }
-  # to execute to pods
-  rule {
-    api_groups = [""]
-    resources  = ["pods/exec"]
-    verbs      = ["create"]
-  }
-}
-
-resource "kubernetes_cluster_role_binding" "read-only" {
-  metadata {
-    name = "read-only"
-  }
-  role_ref {
-    api_group = "rbac.authorization.k8s.io"
-    kind      = "ClusterRole"
-    name      = "read-only"
-  }
-  subject {
-    api_group = "rbac.authorization.k8s.io"
-    kind      = "Group"
-    # the read-only Group is the one listed in the aws-auth configmap
-    name = "read-only"
-  }
-}
-
 # getting the AWS account ID, to use in the configmap aws-auth
 
 data "aws_caller_identity" "caller_identity" {}
@@ -43,7 +6,10 @@ data "aws_caller_identity" "caller_identity" {}
 # aws-auth configmap for EKS, with 2 new entries :
 # - admin user, part of 'system:masters'
 # - readonly user, part of 'readonly'
+
 # it's created via local-exec as we can't overwrite the pre-existing configmap with the 'kubernetes' provider
+# cf https://github.com/terraform-aws-modules/terraform-aws-eks/issues/699
+# and https://github.com/terraform-providers/terraform-provider-kubernetes/issues/719
 
 locals {
   config_map_aws_auth = <<EOF
@@ -91,8 +57,6 @@ resource "null_resource" "apply_config_map_aws_auth" {
 
   # the aws-auth.yaml file + the cluster itself + the kubeconfig must be created before the kubectl execution
   depends_on = [
-    local_file.config_map_aws_auth_file,
-    aws_eks_cluster.eks_cluster,
     local_file.kubeconfig_file
   ]
 

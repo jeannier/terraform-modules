@@ -17,7 +17,7 @@ locals {
 
 # deployment + service for hello-app:1.0
 
-resource "kubernetes_deployment" "hello-world-1" {
+resource "kubernetes_deployment" "deployment_hello_world_1" {
   metadata {
     name = "hello-world-1"
   }
@@ -41,11 +41,12 @@ resource "kubernetes_deployment" "hello-world-1" {
     }
   }
   depends_on = [
-    aws_eks_cluster.eks_cluster
+    # deployments can't complete without the workers nodes
+    aws_eks_node_group.eks_node_group
   ]
 }
 
-resource "kubernetes_service" "hello-world-1" {
+resource "kubernetes_service" "service_hello_world_1" {
   metadata {
     name = "hello-world-1"
   }
@@ -57,14 +58,11 @@ resource "kubernetes_service" "hello-world-1" {
     }
     type = "LoadBalancer"
   }
-  depends_on = [
-    aws_eks_cluster.eks_cluster
-  ]
 }
 
 # deployment + service for hello-app:2.0
 
-resource "kubernetes_deployment" "hello-world-2" {
+resource "kubernetes_deployment" "deployment_hello_world_2" {
   metadata {
     name = "hello-world-2"
   }
@@ -88,11 +86,12 @@ resource "kubernetes_deployment" "hello-world-2" {
     }
   }
   depends_on = [
-    aws_eks_cluster.eks_cluster
+    # deployments can't complete without the workers nodes
+    aws_eks_node_group.eks_node_group
   ]
 }
 
-resource "kubernetes_service" "hello-world-2" {
+resource "kubernetes_service" "service_hello_world_2" {
   metadata {
     name = "hello-world-2"
   }
@@ -104,9 +103,6 @@ resource "kubernetes_service" "hello-world-2" {
     }
     type = "LoadBalancer"
   }
-  depends_on = [
-    aws_eks_cluster.eks_cluster
-  ]
 }
 
 # ingress being read by the nginx-ingress-controller,
@@ -114,7 +110,7 @@ resource "kubernetes_service" "hello-world-2" {
 # http://elb-url/1 --> hello-app:1.0 -> "Version: 1.0.0"
 # http://elb-url/2 --> hello-app:2.0 -> "Version: 2.0.0"
 
-resource "kubernetes_ingress" "hello-world" {
+resource "kubernetes_ingress" "ingress_hello_world" {
   metadata {
     name = "hello-world"
   }
@@ -138,7 +134,4 @@ resource "kubernetes_ingress" "hello-world" {
       }
     }
   }
-  depends_on = [
-    aws_eks_cluster.eks_cluster
-  ]
 }

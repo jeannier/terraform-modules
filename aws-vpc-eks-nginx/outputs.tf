@@ -22,14 +22,14 @@ output "iam_readonly_secret_key" {
 # URLs of our two applications
 
 output "hello-world-url-elb-1" {
-  value = "http://${kubernetes_service.hello-world-1.load_balancer_ingress.0.hostname}:${local.elb_port}/"
+  value = "http://${kubernetes_service.service_hello_world_1.load_balancer_ingress.0.hostname}:${local.elb_port}/"
 }
 output "hello-world-url-elb-2" {
-  value = "http://${kubernetes_service.hello-world-2.load_balancer_ingress.0.hostname}:${local.elb_port}/"
+  value = "http://${kubernetes_service.service_hello_world_2.load_balancer_ingress.0.hostname}:${local.elb_port}/"
 }
 output "hello-world-url-nginx-1" {
-  value = "http://${kubernetes_service.ingress-nginx.load_balancer_ingress.0.hostname}:${local.elb_port}/1"
+  value = "http://${kubernetes_service.service_ingress_nginx.load_balancer_ingress.0.hostname}:${local.elb_port}/1/"
 }
 output "hello-world-url-nginx-2" {
-  value = "http://${kubernetes_service.ingress-nginx.load_balancer_ingress.0.hostname}:${local.elb_port}/2"
+  value = "http://${kubernetes_service.service_ingress_nginx.load_balancer_ingress.0.hostname}:${local.elb_port}/2/"
 }

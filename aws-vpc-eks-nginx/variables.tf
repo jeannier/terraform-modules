@@ -30,6 +30,11 @@ variable "endpoint_public_access" {
   description = "Choose wether the API endpoint is enabled for private access, inside the VPC"
 }
 
+variable "logs_retention_in_days" {
+  type        = number
+  description = "Number of days you want to retain log events. Values are: 1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1827, and 3653."
+}
+
 # Node group variables
 
 variable "node_group_name" {
