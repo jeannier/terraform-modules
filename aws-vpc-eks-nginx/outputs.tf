@@ -19,20 +19,12 @@ output "iam_readonly_secret_key" {
   description = "Readonly secret key"
 }
 
-# URLs of our two applications, via their own ELB
+# URLs of our applications, via nginx-ingress-controller
 
-output "hello-world-1-elb" {
-  value = "http://${kubernetes_service.service_hello_world["hello-world-1"].load_balancer_ingress.0.hostname}:${local.elb_port}/"
-}
-output "hello-world-2-elb" {
-  value = "http://${kubernetes_service.service_hello_world["hello-world-2"].load_balancer_ingress.0.hostname}:${local.elb_port}/"
-}
-
-# URLs of our two applications, via nginx-ingress-controller
-
-output "hello-world-1-nginx" {
-  value = "http://${kubernetes_service.service_ingress_nginx.load_balancer_ingress.0.hostname}:${local.elb_port}/1/"
-}
-output "hello-world-2-nginx" {
-  value = "http://${kubernetes_service.service_ingress_nginx.load_balancer_ingress.0.hostname}:${local.elb_port}/2/"
+output "applications_urls" {
+  value = [
+    for app in local.applications :
+    "http://${kubernetes_service.service_ingress_nginx.load_balancer_ingress.0.hostname}:${local.elb_port}${app.path}/"
+  ]
+  description = "Applications URL"
 }

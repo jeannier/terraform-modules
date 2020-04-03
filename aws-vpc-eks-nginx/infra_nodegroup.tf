@@ -31,7 +31,7 @@ resource "aws_iam_role" "iam_role_workers" {
 data "aws_iam_policy_document" "iam_policy_document_workers" {
   statement {
     actions = [
-      "sts:AssumeRole",
+      "sts:AssumeRole"
     ]
     principals {
       type        = "Service"
