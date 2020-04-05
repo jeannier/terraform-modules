@@ -1,5 +1,3 @@
-data "aws_region" "current" {
-}
 
 locals {
   kubeconfig = <<EOF
@@ -24,7 +22,7 @@ users:
       apiVersion: client.authentication.k8s.io/v1alpha1
       args:
       - --region
-      - ${data.aws_region.current.name}
+      - ${var.aws_region}
       - eks
       - get-token
       - --cluster-name

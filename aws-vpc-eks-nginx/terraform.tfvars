@@ -24,3 +24,4 @@ node_group_release_version = "1.15.10-20200228"
 # applications
 metrics_server_version           = "0.3.6"
 nginx_ingress_controller_version = "0.30.0"
+autoscaler_image                 = "eu.gcr.io/k8s-artifacts-prod/autoscaling/cluster-autoscaler:v1.15.6"

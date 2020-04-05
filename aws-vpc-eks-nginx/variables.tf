@@ -57,13 +57,14 @@ variable "node_group_release_version" {
   description = "Node group release version"
 }
 
-#
+# apps versions/images
 
 variable "metrics_server_version" {
   description = "metrics-server version"
 }
-
 variable "nginx_ingress_controller_version" {
   description = "Nginx-Ingress-Controller version"
 }
-
+variable "autoscaler_image" {
+  description = "cluster-autoscaler docker image url"
+}

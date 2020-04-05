@@ -5,26 +5,26 @@ locals {
   container_port = 8080
   elb_port       = 80
   applications = {
-    # "hello-app-1" = {
-    #   "labels" = { application = "hello-app-1" }
-    #   "image"  = "gcr.io/google-samples/hello-app:1.0"
-    #   "path"   = "/helloapp1"
-    # },
-    # "hello-app-2" = {
-    #   "labels" = { application = "hello-app-2" }
-    #   "image"  = "gcr.io/google-samples/hello-app:2.0"
-    #   "path"   = "/helloapp2"
-    # },
+    "hello-app-1" = {
+      "labels" = { application = "hello-app-1" }
+      "image"  = "gcr.io/google-samples/hello-app:1.0"
+      "path"   = "/helloapp1"
+    },
+    "hello-app-2" = {
+      "labels" = { application = "hello-app-2" }
+      "image"  = "gcr.io/google-samples/hello-app:2.0"
+      "path"   = "/helloapp2"
+    },
     "hello-node" = {
       "labels" = { application = "hello-node" }
       "image"  = "gcr.io/hello-minikube-zero-install/hello-node"
       "path"   = "/hellonode"
     },
-    # "hello-kub" = {
-    #   "labels" = { application = "hello-kub" }
-    #   "image"  = "paulbouwer/hello-kubernetes:1.7" # TODO : needs a "rewrite-target"
-    #   "path"   = "/hellokub"
-    # },
+    "hello-kub" = {
+      "labels" = { application = "hello-kub" }
+      "image"  = "paulbouwer/hello-kubernetes:1.7" # TODO : needs a "rewrite-target"
+      "path"   = "/hellokub"
+    },
   }
 }
 
@@ -59,7 +59,8 @@ resource "kubernetes_deployment" "deployment_apps" {
 
   # deployments can't complete without the workers nodes
   depends_on = [
-    aws_eks_node_group.eks_node_group
+    aws_eks_node_group.eks_node_group_01,
+    aws_eks_node_group.eks_node_group_02
   ]
 
   # to allow the horizontal pod autoscaler to make changes to the number of replicas,
@@ -133,7 +134,7 @@ resource "kubernetes_horizontal_pod_autoscaler" "horizontal_pod_autoscaler_apps"
   }
   spec {
     min_replicas                      = 1
-    max_replicas                      = 10
+    max_replicas                      = 100
     target_cpu_utilization_percentage = 80
 
     scale_target_ref {

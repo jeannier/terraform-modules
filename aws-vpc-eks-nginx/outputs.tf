@@ -1,20 +1,20 @@
 
 # users keys
 
-output "iam_administrator_access_key" {
+output "administrator_access_key" {
   value       = aws_iam_access_key.administrator.id
   description = "Administrator access key"
 }
-output "iam_administrator_secret_key" {
+output "administrator_secret_key" {
   value       = aws_iam_access_key.administrator.secret
   description = "Administrator secret key"
 }
 
-output "iam_readonly_access_key" {
+output "readonly_access_key" {
   value       = aws_iam_access_key.readonly.id
   description = "Readonly access key"
 }
-output "iam_readonly_secret_key" {
+output "readonly_secret_key" {
   value       = aws_iam_access_key.readonly.secret
   description = "Readonly secret key"
 }

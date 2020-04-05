@@ -1,10 +1,12 @@
-# creating the two IAM users
+# creating the two IAM users + keys
+
 resource "aws_iam_user" "administrator" {
   name = "${var.cluster_name}-administrator"
 }
 resource "aws_iam_access_key" "administrator" {
   user = aws_iam_user.administrator.name
 }
+
 resource "aws_iam_user" "readonly" {
   name = "${var.cluster_name}-readonly"
 }
