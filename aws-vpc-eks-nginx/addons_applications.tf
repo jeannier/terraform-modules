@@ -1,38 +1,9 @@
 
-# configuration for our applications
-
-locals {
-  container_port = 8080
-  elb_port       = 80
-  applications = {
-    "hello-app-1" = {
-      "labels" = { application = "hello-app-1" }
-      "image"  = "gcr.io/google-samples/hello-app:1.0"
-      "path"   = "/helloapp1"
-    },
-    "hello-app-2" = {
-      "labels" = { application = "hello-app-2" }
-      "image"  = "gcr.io/google-samples/hello-app:2.0"
-      "path"   = "/helloapp2"
-    },
-    "hello-node" = {
-      "labels" = { application = "hello-node" }
-      "image"  = "gcr.io/hello-minikube-zero-install/hello-node"
-      "path"   = "/hellonode"
-    },
-    "hello-kub" = {
-      "labels" = { application = "hello-kub" }
-      "image"  = "paulbouwer/hello-kubernetes:1.7" # TODO : needs a "rewrite-target"
-      "path"   = "/hellokub"
-    },
-  }
-}
-
 # deployment for the applications
 
 resource "kubernetes_deployment" "deployment_apps" {
 
-  for_each = local.applications
+  for_each = var.applications
 
   metadata {
     name = each.key
@@ -50,7 +21,7 @@ resource "kubernetes_deployment" "deployment_apps" {
           image = each.value.image
           name  = each.key
           port {
-            container_port = local.container_port
+            container_port = each.value.container_port
           }
         }
       }
@@ -76,7 +47,7 @@ resource "kubernetes_deployment" "deployment_apps" {
 
 resource "kubernetes_service" "service_apps" {
 
-  for_each = local.applications
+  for_each = var.applications
 
   metadata {
     name = each.key
@@ -84,8 +55,8 @@ resource "kubernetes_service" "service_apps" {
   spec {
     selector = each.value.labels
     port {
-      port        = local.elb_port
-      target_port = local.container_port
+      port        = var.elb_port
+      target_port = each.value.container_port
     }
     # type = "LoadBalancer"
   }
@@ -105,13 +76,13 @@ resource "kubernetes_ingress" "ingress_apps" {
       http {
 
         dynamic "path" {
-          for_each = local.applications
+          for_each = var.applications
           content {
 
             path = path.value.path
             backend {
               service_name = path.key
-              service_port = local.container_port
+              service_port = path.value.container_port
             }
 
           }
@@ -123,19 +94,19 @@ resource "kubernetes_ingress" "ingress_apps" {
 }
 
 # horizontal pod autoscalers for the applications
-# we can scale between 1 and 10 replicas per deployment
+# we can scale automatically the numbers of replicas per deployment
 
 resource "kubernetes_horizontal_pod_autoscaler" "horizontal_pod_autoscaler_apps" {
 
-  for_each = local.applications
+  for_each = var.applications
 
   metadata {
     name = each.key
   }
   spec {
-    min_replicas                      = 1
-    max_replicas                      = 100
-    target_cpu_utilization_percentage = 80
+    min_replicas                      = var.horizontal_pod_autoscaler_min_replicas
+    max_replicas                      = var.horizontal_pod_autoscaler_max_replicas
+    target_cpu_utilization_percentage = var.horizontal_pod_autoscaler_target_cpu
 
     scale_target_ref {
       api_version = "apps/v1"

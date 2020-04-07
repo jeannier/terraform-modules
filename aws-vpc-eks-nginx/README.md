@@ -11,6 +11,7 @@ This will create :
 - deployment/services/horizontalpodscaler for a few "hello-word" apps
 - an ingress which is creating an URL for each of the apps under the same load-balancer
 - autoscaler is setup
+- AWS CloudWatch Container Insight is setup
 
 Step by step :
 - Install kubectl
@@ -27,8 +28,3 @@ terraform apply
 Outputs :
 - credentials for the admin and readonly users
 - URLs for each "hello-world" apps via the load-balancer of the Nginx-Ingress-Controller
-
-TODO :
-- https://github.com/aws/amazon-cloudwatch-logs-for-fluent-bit / https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Container-Insights-setup-logs.html
-- Grafana dashboard (using Prometheus data)
-- Istio : https://eksworkshop.com/servicemesh_with_istio/install/

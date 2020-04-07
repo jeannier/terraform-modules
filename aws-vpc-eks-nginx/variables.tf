@@ -68,3 +68,19 @@ variable "nginx_ingress_controller_version" {
 variable "autoscaler_image" {
   description = "cluster-autoscaler docker image url"
 }
+variable "elb_port" {
+  description = "port on which the load-balancer will listen to"
+}
+variable "applications" {
+  description = "applications to deploy in the cluster"
+  type        = map
+}
+variable "horizontal_pod_autoscaler_min_replicas" {
+  description = "minimum amout of replicas per deployment"
+}
+variable "horizontal_pod_autoscaler_max_replicas" {
+  description = "maximum amout of replicas per deployment"
+}
+variable "horizontal_pod_autoscaler_target_cpu" {
+  description = "maximum cpu usage before scaling up the number of replicas"
+}

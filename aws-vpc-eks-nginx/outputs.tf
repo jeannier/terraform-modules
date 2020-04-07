@@ -23,8 +23,8 @@ output "readonly_secret_key" {
 
 output "applications_urls" {
   value = [
-    for app in local.applications :
-    "http://${kubernetes_service.service_ingress_nginx.load_balancer_ingress.0.hostname}:${local.elb_port}${app.path}/"
+    for app in var.applications :
+    "http://${kubernetes_service.service_ingress_nginx.load_balancer_ingress.0.hostname}:${var.elb_port}${app.path}/"
   ]
   description = "Applications URL"
 }

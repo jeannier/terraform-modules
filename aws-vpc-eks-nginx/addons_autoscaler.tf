@@ -1,4 +1,4 @@
-# this was generated with https://github.com/sl1pm4t/k2tf
+# conversion done with https://github.com/sl1pm4t/k2tf (with --tf12format)
 # from https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/cloudprovider/aws/examples/cluster-autoscaler-autodiscover.yaml
 # and the deployment annotations + command + image url was tweaked for purpose
 # automount_service_account_token was also added
@@ -7,20 +7,14 @@ resource "kubernetes_service_account" "cluster_autoscaler" {
   metadata {
     name      = "cluster-autoscaler"
     namespace = "kube-system"
-    labels = {
-      k8s-addon = "cluster-autoscaler.addons.k8s.io"
-      k8s-app   = "cluster-autoscaler"
-    }
+    labels    = { k8s-addon = "cluster-autoscaler.addons.k8s.io", k8s-app = "cluster-autoscaler" }
   }
 }
 
 resource "kubernetes_cluster_role" "cluster_autoscaler" {
   metadata {
-    name = "cluster-autoscaler"
-    labels = {
-      k8s-addon = "cluster-autoscaler.addons.k8s.io"
-      k8s-app   = "cluster-autoscaler"
-    }
+    name   = "cluster-autoscaler"
+    labels = { k8s-addon = "cluster-autoscaler.addons.k8s.io", k8s-app = "cluster-autoscaler" }
   }
   rule {
     verbs      = ["create", "patch"]
@@ -95,10 +89,7 @@ resource "kubernetes_role" "cluster_autoscaler" {
   metadata {
     name      = "cluster-autoscaler"
     namespace = "kube-system"
-    labels = {
-      k8s-addon = "cluster-autoscaler.addons.k8s.io"
-      k8s-app   = "cluster-autoscaler"
-    }
+    labels    = { k8s-addon = "cluster-autoscaler.addons.k8s.io", k8s-app = "cluster-autoscaler" }
   }
   rule {
     verbs      = ["create", "list", "watch"]
@@ -115,11 +106,8 @@ resource "kubernetes_role" "cluster_autoscaler" {
 
 resource "kubernetes_cluster_role_binding" "cluster_autoscaler" {
   metadata {
-    name = "cluster-autoscaler"
-    labels = {
-      k8s-addon = "cluster-autoscaler.addons.k8s.io"
-      k8s-app   = "cluster-autoscaler"
-    }
+    name   = "cluster-autoscaler"
+    labels = { k8s-addon = "cluster-autoscaler.addons.k8s.io", k8s-app = "cluster-autoscaler" }
   }
   subject {
     kind      = "ServiceAccount"
@@ -132,14 +120,12 @@ resource "kubernetes_cluster_role_binding" "cluster_autoscaler" {
     name      = "cluster-autoscaler"
   }
 }
+
 resource "kubernetes_role_binding" "cluster_autoscaler" {
   metadata {
     name      = "cluster-autoscaler"
     namespace = "kube-system"
-    labels = {
-      k8s-addon = "cluster-autoscaler.addons.k8s.io"
-      k8s-app   = "cluster-autoscaler"
-    }
+    labels    = { k8s-addon = "cluster-autoscaler.addons.k8s.io", k8s-app = "cluster-autoscaler" }
   }
   subject {
     kind      = "ServiceAccount"
@@ -157,33 +143,24 @@ resource "kubernetes_deployment" "cluster_autoscaler" {
   metadata {
     name      = "cluster-autoscaler"
     namespace = "kube-system"
-    labels = {
-      app = "cluster-autoscaler"
-    }
+    labels    = { app = "cluster-autoscaler" }
   }
   spec {
     replicas = 1
     selector {
-      match_labels = {
-        app = "cluster-autoscaler"
-      }
+      match_labels = { app = "cluster-autoscaler" }
     }
     template {
       metadata {
-        labels = {
-          app = "cluster-autoscaler"
-        }
-        annotations = {
-          "prometheus.io/port"                             = "8085"
-          "prometheus.io/scrape"                           = "true"
-          "cluster-autoscaler.kubernetes.io/safe-to-evict" = "false"
-        }
+        labels      = { app = "cluster-autoscaler" }
+        annotations = { "prometheus.io/port" = "8085", "prometheus.io/scrape" = "true" }
       }
       spec {
 
         # IMPORTANT - it's not set in aws/examples/cluster-autoscaler-autodiscover.yaml
         # but if we don't specify here, it will be set to false, and the pod won't be
         # able to get a k8s token, and won't be able to communicate with the k8s API
+        # https://github.com/terraform-providers/terraform-provider-kubernetes/issues/263
         automount_service_account_token = true
 
         volume {

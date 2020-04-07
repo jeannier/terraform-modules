@@ -142,6 +142,13 @@ resource "aws_iam_role_policy_attachment" "autoscaling_attachment" {
   role       = aws_iam_role.iam_role_workers.id
 }
 
+# IAM role which allows the EKS workers to send their logs to Cloudwatch
+
+resource "aws_iam_role_policy_attachment" "CloudWatchAgentServerPolicy" {
+  role       = aws_iam_role.iam_role_workers.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+}
+
 # testing the node groups
 # using a hack from https://github.com/hashicorp/terraform/issues/15469#issuecomment-515240849
 # we're opening a non-existing file if the nodes groups status aren't "ACTIVE", in order to raise an error
