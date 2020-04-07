@@ -47,10 +47,10 @@ applications = {
   },
   hello-kub = {
     labels         = { application = "hello-kub" }
-    image          = "paulbouwer/hello-kubernetes:1.7" # TODO : needs a "rewrite-target"
+    image          = "paulbouwer/hello-kubernetes:1.7"
     path           = "/hellokub"
     container_port = 8080
-  },
+  }
 }
 horizontal_pod_autoscaler_min_replicas = 1
 horizontal_pod_autoscaler_max_replicas = 100

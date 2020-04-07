@@ -70,6 +70,9 @@ resource "kubernetes_service" "service_apps" {
 resource "kubernetes_ingress" "ingress_apps" {
   metadata {
     name = "hello-world"
+    annotations = {
+      "nginx.ingress.kubernetes.io/rewrite-target" = "/$2"
+    }
   }
   spec {
     rule {
@@ -79,7 +82,7 @@ resource "kubernetes_ingress" "ingress_apps" {
           for_each = var.applications
           content {
 
-            path = path.value.path
+            path = "${path.value.path}(/|$)(.*)"
             backend {
               service_name = path.key
               service_port = path.value.container_port
