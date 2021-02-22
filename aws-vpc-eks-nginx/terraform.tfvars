@@ -8,7 +8,7 @@ vpc_name = "eks-vpc"
 
 # cluster
 cluster_name            = "eks-alex"
-kubernetes_version      = 1.15
+kubernetes_version      = 1.17
 endpoint_private_access = false
 endpoint_public_access  = true
 logs_retention_in_days  = 3
@@ -19,12 +19,12 @@ node_group_instance_types  = ["t2.small"]
 node_group_desired_size    = 1
 node_group_max_size        = 5
 node_group_min_size        = 1
-node_group_release_version = "1.15.10-20200228"
+node_group_release_version = "1.17.9-20200904"
 
 # applications
 metrics_server_version           = "0.3.6"
 nginx_ingress_controller_version = "0.30.0"
-autoscaler_image                 = "eu.gcr.io/k8s-artifacts-prod/autoscaling/cluster-autoscaler:v1.15.6"
+autoscaler_image                 = "eu.gcr.io/k8s-artifacts-prod/autoscaling/cluster-autoscaler:v1.17.3"
 elb_port                         = 80
 applications = {
   hello-app-1 = {
